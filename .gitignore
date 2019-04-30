@@ -1,0 +1,4 @@
+composer.lock
+ipfinder.phar
+/vendor/
+/output/

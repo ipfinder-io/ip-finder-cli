@@ -1,0 +1,41 @@
+{
+    "name": "ipfinder-io/ip-finder-cli",
+    "description": "The official command line client for IPFinder https://ipfinder.io/",
+    "homepage": "https://ipfinder.io/",
+    "keywords": ["ipfinder", "IPV4", "IPV6", "ASN", "Cli","Command Line Interface","detect", "Bulk"],
+    "license": "MIT",
+    "authors": [{
+        "name": "Mohamed Ben rebia",
+        "email": "mohamed@ipfinder.io",
+        "homepage": "https://github.com/benemohamed",
+        "role": "Developer"
+    }],
+    "require": {
+        "php": "^7.0",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ipfinder/ipfinder": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src"
+        }
+    },
+    "bin": [
+        "bin/ipfinder"
+    ],
+    "scripts": {
+        "compile": "php  bin/compile"
+    },
+    "scripts-descriptions": {
+        "compile": "Compile ipfinder.phar"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-1.0": "1.0.x-dev"
+        }
+    }
+}
