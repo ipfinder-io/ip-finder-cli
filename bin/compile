@@ -1,11 +1,11 @@
-#!/usr/bin/env php  -q
+#!/usr/bin/env php
 <?php
 
 try {
     $argv_1 = $argv[1] or die("usage: {$argv[2]} <dir>\n");
     $argv_2 = $argv[2] or die("usage: {$argv[3]} <output>\n");
 
-	// Install with the current version to force it having the right ClassLoader version
+    // Install with the current version to force it having the right ClassLoader version
     // Install without dev packages to clean up the included classmap from phpunit classes
     shell_exec('composer install -q --no-dev');
     shell_exec('composer config autoloader-suffix --unset');

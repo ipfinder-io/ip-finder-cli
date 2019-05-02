@@ -1,4 +1,4 @@
-#!/usr/bin/env php  -q
+#!/usr/bin/env php
 <?php
 date_default_timezone_set('UTC');
 if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
@@ -12,12 +12,15 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
 @ini_set('display_startup_errors', 1);
 @ini_set('display_errors', 1);
 @error_reporting(-1);
-@set_time_limit(0);
-// ini_set('memory_limit', '256M');
-// ini_set('display_errors', 0);
-@ini_set('max_execution_time', 0);
-@ini_set('allow_url_fopen', 1);
-@ob_start();
+// if(!defined("STDIN")) {
+// define("STDIN", fopen('php://stdin','rb'));
+// }
+// @set_time_limit(0);
+// // ini_set('memory_limit', '256M');
+// // ini_set('display_errors', 0);
+// @ini_set('max_execution_time', 0);
+// @ini_set('allow_url_fopen', 1);
+// @ob_start();
 
 $app = new App\Application();
 

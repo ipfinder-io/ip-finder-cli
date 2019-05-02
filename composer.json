@@ -3,7 +3,7 @@
     "description": "The official command line client for IPFinder https://ipfinder.io/",
     "homepage": "https://ipfinder.io/",
     "keywords": ["ipfinder", "IPV4", "IPV6", "ASN", "Cli","Command Line Interface","detect", "Bulk"],
-    "license": "MIT",
+    "license": "Apache-2.0",
     "authors": [{
         "name": "Mohamed Ben rebia",
         "email": "mohamed@ipfinder.io",
@@ -14,7 +14,7 @@
         "php": "^7.0",
         "ext-curl": "*",
         "ext-json": "*",
-        "ipfinder/ipfinder": "dev-master"
+        "ipfinder/ipfinder": "^1.0"
     },
     "autoload": {
         "psr-4": {
