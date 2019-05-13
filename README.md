@@ -28,7 +28,7 @@ First, download the IPfinder cli using Composer:
 ```php
 composer global require ipfinder-io/ip-finder-cli
 ```
-Make sure to place composer's system-wide vendor bin directory in your `$PATH` so the laravel executable can be located by your system. This directory exists in different locations based on your operating system; however, some common locations include:
+Make sure to place composer's system-wide vendor bin directory in your `$PATH` so the IPfinder executable can be located by your system. This directory exists in different locations based on your operating system; however, some common locations include:
 - macOS: `$HOME/.composer/vendor/bin`
 - GNU / Linux Distributions: `$HOME/.config/composer/vendor/bin`
 - Windows: `%USERPROFILE%\AppData\Roaming\Composer\vendor\bin`
@@ -53,7 +53,7 @@ C:\Users\username> cd C:\bin
 C:\bin> echo @php "%~dp0ipfinder.phar" %* > ipfinder.cmd
 C:\bin> exit
 ```
-5. Open a new command line and confirm that you can execute PHPUnit from any path:
+5. Open a new command line and confirm that you can execute IPfinder from any path:
 ```bash
 C:\Users\username> ipfinder --help
 ````
