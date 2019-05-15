@@ -1,0 +1,26 @@
+name: ipfinder-cli 
+base: core18 
+version: '1.0.0' 
+summary: The official command line client for IPFinder https://ipfinder.io/
+description: |
+  PFinder CLI (Command Line Interface) https://ipfinder.io/
+  Supports Single IP Address, asn, ranges, firewall as Input
+  Supports Bulk
+  Exports Results to Screen or to An Output File
+  Supports IPv4 and IPv6
+  Supports ASN number , RANGES , Firewall.
+
+grade: devel 
+confinement: devmode 
+
+apps:
+  ipfinder:
+    command: Debian/ipfinder/files/usr/bin/ipfinder
+  bash:
+    command: bash
+
+parts:
+  ipfinder:
+    # See 'snapcraft plugins'
+    source: https://github.com/ipfinder-io/ip-finder-cli/archive/v1.0.0.tar.gz
+    plugin: nil

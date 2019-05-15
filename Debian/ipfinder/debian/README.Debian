@@ -1,0 +1,38 @@
+ipfinder for Debian
+------------------
+
+-h ,--help  This help text
+-o ,--output  save to a given file
+-u ,--update  App Code update.
+-a ,--auth   lookup your IP address information.
+	[Example]:
+		 $ ipfinder -a
+-i ,--ip  fetching IP address information.
+	[Example]:
+		 $ ipfinder --ip 1.0.0.0
+		 $ ipfinder -i 2c0f:fb50:4003::
+		 $ ipfinder -i filename
+-n ,--asn   fetching AS number information.
+	[Example]:
+		 $ ipfinder --ip 1.0.0.0
+		 $ ipfinder -i 2c0f:fb50:4003::
+		 $ ipfinder -i filename
+-r ,--ranges fetching IP Address Ranges information.
+	[Example]:
+		 $ ipfinder --ip 1.0.0.0
+		 $ ipfinder -i 2c0f:fb50:4003::
+		 $ ipfinder -i filename
+-f ,--firewall fetching firewall information supported format https://ipfinder.io/docs/?shell#firewall.
+	[Example]:
+		 $ ipfinder -f AS1 --format juniper_junos 
+		 $ ipfinder --firewall DZ -m web_config_allow 
+-s ,--status   Get information for your token.
+	[Example]:
+		 $ ipfinder -s
+-g ,--config  Add your Token.
+	[Example]:
+		 $ ipfinder --config {Your_token_here}
+-l ,--shell  Run interactively.
+
+
+ -- moha <mohamed@ipfinder.io>  Tue, 30 Apr 2019 20:00:29 +0100

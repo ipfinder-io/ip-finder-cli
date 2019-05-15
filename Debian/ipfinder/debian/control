@@ -1,0 +1,20 @@
+Source: ipfinder
+Section: web
+Priority: optional
+Maintainer: moha <mohamed@ipfinder.io>
+Build-Depends: debhelper (>=9)
+Standards-Version: 3.9.6
+Homepage: https://ipfinder.io/
+#Vcs-Git: git://anonscm.debian.org/collab-maint/ipfinder.git
+#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/ipfinder.git
+
+Package: ipfinder
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends} php7.0-cli, php7.0-curl, php7.0-common, php7.0-json
+Description: The official command line client for IPFinder https://ipfinder.io/
+ IPFinder CLI (Command Line Interface) https://ipfinder.io/
+ * Supports Single IP Address, asn, ranges, firewall as Input
+ * Supports Bulk
+ * Exports Results to Screen or to An Output File
+ * Supports ASN number , RANGES , Firewall
+ * Supports IPv4 and IPv6

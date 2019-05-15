@@ -1,0 +1,16 @@
+Package: ipfinder
+Version: 1.0.0
+Architecture: all
+Maintainer: moha <mohamed@ipfinder.io>
+Installed-Size: 449
+Depends: php7.0-cli, php7.0-curl, php7.0-common, php7.0-json
+Section: web
+Priority: optional
+Homepage: https://ipfinder.io/
+Description: The official command line client for IPFinder https://ipfinder.io/
+ IPFinder CLI (Command Line Interface) https://ipfinder.io/
+ * Supports Single IP Address, asn, ranges, firewall as Input
+ * Supports Bulk
+ * Exports Results to Screen or to An Output File
+ * Supports ASN number , RANGES , Firewall
+ * Supports IPv4 and IPv6

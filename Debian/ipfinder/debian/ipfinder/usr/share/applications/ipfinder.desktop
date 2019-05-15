@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=IPFinder
+Comment=IPFinder CLI (Command Line Interface) https://ipfinder.io/
+Icon=ipfinder.png
+Exec=ipfinder --shell
+Categories=GTK;GNOME;Network;
+Terminal=true
