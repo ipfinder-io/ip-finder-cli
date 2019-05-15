@@ -51,7 +51,7 @@ class Application
      *
      * @var string
      */
-    const VERSION = '1.0.0';
+    const VERSION = '1.0.1';
 
     /**
      * The hidden folder name
@@ -80,7 +80,7 @@ class Application
      */
     public function __construct()
     {
-        $this->version = '1.0.0';
+        
         if (isset($_SERVER['HOME'])) {
            $this->home    = $_SERVER['HOME'] . '/';
         } else {
@@ -95,7 +95,6 @@ class Application
         $this->query = $this->ipfinder . '/' . self::QUERY . ".csv";
         $this->date  = $this->ipfinder . '/' . self::QUERY . '-' . date("Y-m-d") . ".json";
 
-        $this->version = '1.0.0';
 
         // create hidden folder
         (!is_dir($this->ipfinder) ? mkdir($this->ipfinder, 0777, true) : null);
