@@ -16,6 +16,11 @@
         "ext-json": "*",
         "ipfinder/ipfinder": "^1.0"
     },
+  "require-dev": {
+    "humbug/box": "3.8.0",
+    "squizlabs/php_codesniffer": "^3.4.2",
+    "phpunit/phpunit": "^8.2.2"
+  },
     "autoload": {
         "psr-4": {
             "App\\": "src"
@@ -25,7 +30,7 @@
         "bin/ipfinder"
     ],
     "scripts": {
-        "compile": "php  bin/compile"
+        "compile": "./vendor/bin/box compile"
     },
     "scripts-descriptions": {
         "compile": "Compile ipfinder.phar"
