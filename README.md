@@ -6,7 +6,7 @@
 -  Supports ASN number , RANGES , Firewall
 
 ## Getting Started
-singing up for a free account at [https://ipfinder.io/auth/signup](https://ipfinder.io/auth/signup), for Free IPFinder API access token.
+sign up  for a free account at [https://ipfinder.io/auth/signup](https://ipfinder.io/auth/signup), for Free IPFinder API access token.
 
 The free plan is limited to 4,000 requests a day, and doesn't include some of the data fields
 To enable all the data fields and additional request volumes see [https://ipfinder.io/pricing](https://ipfinder.io/pricing).
@@ -56,10 +56,10 @@ C:\bin> exit
 ```bash
 C:\Users\username> ipfinder --help
 ````
-### Command
+### Command list
 
 | shortopts   | longopts     | Description
-| ----------- | -----------  |
+| ----------- | -----------  |-----------
 | `-h`      | `--help`    | This help text
 | `-o`      | `--output`  |  save to a given file
 | `-u`      | `--update`  | App Code update
@@ -81,49 +81,3 @@ C:\Users\username> ipfinder --help
 Licensed under the [Apache-2.0](https://github.com/ipfinder-io/ip-finder-cli/blob/master/LICENSE).
 ## Support
 Contact Us With Additional Questions About Our API, if you would like more information about our API that isn’t available in our IP geolocation API developer documentation, simply [contact](https://ipfinder.io/contact) us at any time and we’ll be able to help you find what you need..
-
--h ,--help  This help text
--o ,--output  save to a given file
--u ,--update  App Code update
--a ,--auth   lookup your IP address information.
--m ,--format   Enter format name (e.g. web_config_deny, cisco_acl, network_object):
-    [Example]:
-         $ ipfinder -a
--i ,--ip  fetching IP address information.
-    [Example]:
-         $ ipfinder --ip 1.0.0.0
-         $ ipfinder -i 2c0f:fb50:4003::
-         $ ipfinder -i filename
--n ,--asn   fetching AS number information.
-    [Example]:
-         $ ipfinder --ip 1.0.0.0
-         $ ipfinder -i 2c0f:fb50:4003::
-         $ ipfinder -i filename
--r ,--ranges fetching IP Address Ranges information.
-    [Example]:
-         $ ipfinder --ranges 'Telecom Algeria'
-         $ ipfinder -r 'Telecom Algeria'
--f ,--firewall fetching firewall information supported format https://ipfinder.io/docs/?shell#firewall.
-    [Example]:
-         $ ipfinder -f AS1 --format juniper_junos
-         $ ipfinder --firewall DZ -m web_config_allow
--d ,--domain Get information for Domain IP.
-    [Example]:
-         $ ipfinder -d google.com
-         $ ipfinder --domain google.com
--dh ,--dhistory Get information for Domain IP history.
-    [Example]:
-         $ ipfinder -dh google.com
-         $ ipfinder --dhistory google.com
--dl ,--dlist Get information for list Domain By ASN, Country,Ranges.
-    [Example]:
-         $ ipfinder -dl AS1
-         $ ipfinder --dlist DZ
--s ,--status   Get information for your token.
-
-    [Example]:
-         $ ipfinder -s
--g ,--config  Add your Token.
-    [Example]:
-         $ ipfinder --config
--l ,--shell  Run interactively
