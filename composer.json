@@ -26,11 +26,19 @@
             "App\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests"
+        }
+    },
     "bin": [
         "bin/ipfinder"
     ],
     "scripts": {
-        "compile": "./vendor/bin/box compile"
+        "compile": "./vendor/bin/box compile",
+        "test": "phpunit",
+        "format" : "phpcbf -p --standard=PSR2 src/",
+        "check"  : "phpcs -p --standard=PSR2 src/"
     },
     "scripts-descriptions": {
         "compile": "Compile ipfinder.phar"

@@ -1,5 +1,11 @@
 <?php
 namespace App\Shell;
+
+/**
+ *  Copyright 2019 Mohamed Benrebia <mohamed@ipfinder.io>
+ */
+
+
 /**
  * Class Shell
  */
@@ -18,6 +24,5 @@ class Shell
         } while ($line == null);
         fclose($handle);
         return $line;
-        
     }
 }

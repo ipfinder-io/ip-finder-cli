@@ -1,38 +1,40 @@
 <?php namespace App;
 
-/**
+/*
+ * Copyright 2019 Mohamed Benrebia <mohamed@ipfinder.io>
  *
- * All rights reserved.
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ *
+ * @see       This file is part of the box project.
+ * @see       https://github.com/humbug/box/
  * @category  App
  * @author    Mohamed Benrebia <mohamed@ipfinder.io>
  * @copyright 2019 Mohamed Benrebia
- * @license   http://www.opensource.org/licenses/mit-license.php MIT License
+ * @license   https://opensource.org/licenses/Apache-2.0 Apache License, Version 2.0
  * @link      https://ipfinder.io
  */
 
 use App\Banners;
 use App\Color;
 use App\Shell\Shell;
+
 use ipfinder\ipfinder\Exception\IPfinderException;
 use ipfinder\ipfinder\IPfinder;
 use ipfinder\ipfinder\Validation\Asnvalidation;
 use ipfinder\ipfinder\Validation\Firewallvalidation;
 use ipfinder\ipfinder\Validation\Ipvalidation;
-
-
+use ipfinder\ipfinder\Validation\Tokenvalidation;
 
 /**
  * The main class.
@@ -40,18 +42,18 @@ use ipfinder\ipfinder\Validation\Ipvalidation;
  * @category  App
  * @author    Mohamed Benrebia <mohamed@ipfinder.io>
  * @copyright 2019 Mohamed Benrebia
- * @license   http://www.opensource.org/licenses/mit-license.php MIT License
+ * @license   https://opensource.org/licenses/Apache-2.0 Apache License, Version 2.0
  * @link      https://ipfinder.io
- * @version   1.0.0
+ * @version   1.0.2
  */
-class Application
+class Application extends Color
 {
     /**
      * Current version ipfinder cli
      *
      * @var string
      */
-    const VERSION = '1.0.1';
+    const VERSION = '1.0.2';
 
     /**
      * The hidden folder name
@@ -75,21 +77,29 @@ class Application
     const QUERY = 'query';
 
     /**
+     * current FOLDER to save data
+     *
+     * @var string
+     */
+    const DATA = 'DATA';
+
+    /**
      * This is a static class, do not instantiate it
      *
      */
     public function __construct()
     {
-        
+
         if (isset($_SERVER['HOME'])) {
-           $this->home    = $_SERVER['HOME'] . '/';
+            $this->home    = $_SERVER['HOME'] . '/';
         } else {
             $this->home   = $_SERVER['HOMEPATH'] . '/';
         }
-        
+
 
         $this->version  = self::VERSION;
         $this->ipfinder = $this->home . self::IPFINDER;
+        $this->ipfinderdata = $this->ipfinder.'/'.self::DATA;
         $this->token    = $this->home . self::TOKEN.".json";
 
         $this->query = $this->ipfinder . '/' . self::QUERY . ".csv";
@@ -98,6 +108,9 @@ class Application
 
         // create hidden folder
         (!is_dir($this->ipfinder) ? mkdir($this->ipfinder, 0777, true) : null);
+
+        // Data FOLDER inside  hidden folder
+        (!is_dir($this->ipfinderdata) ? mkdir($this->ipfinderdata, 0777, true) : null);
 
         // create hidden file
         (!file_exists($this->token) ? touch($this->token) : null);
@@ -112,52 +125,59 @@ class Application
 
         if (filesize($this->token) == 0) {
             $this->lang = require_once(__DIR__."/lang/en.php");
-            $this->lib = new IPfinder('free');
+            $this->lib = new IPfinder();
             $this->output = 'table';
         } else {
-            
             if (file_exists(__DIR__ . "/lang/{$arr->__lang}.php")) {
-               $this->lang = require __DIR__ . "/lang/{$arr->__lang}.php";
-            }  else {
-               $this->lang = require __DIR__ . "/lang/en.php";
+                $this->lang = require __DIR__ . "/lang/{$arr->__lang}.php";
+            } else {
+                $this->lang = require __DIR__ . "/lang/en.php";
             }
-            
-            $this->lib    = new IPfinder($arr->__token);
+
+         // Tokenvalidation::validate($arr->__token);
+            $this->lib = new IPfinder($arr->__token);
+
             $this->output = $arr->__output;
-
         }
-        
-        // sendbox
-        // $this->lib    = new IPfinder($this->token_api, 'http://api.sample.com/v1/');
-        $this->color  = new Color();
-        $this->banner = new Banners('version: ' . $this->version);
 
+     // sendbox
+     // $this->lib    = new IPfinder($this->token_api, 'http://api.sample.com/v1/');
+        $this->color  = new Color();
+
+     //   echo $this->colors['LIGHT_GREEN']."asdasdsd";
+        $this->banner = new Banners('version: ' . $this->version);
     }
     /**
      * Set the Command options
      *
      * @param  array   $commande_shortopts   The shortopts lits
      * @param  array   $commande_longopts    The longopts row
-     * @return   list app command $this->options
+     * @return array   list app command $this->options
      */
     public function Command($commande_shortopts = [], $commande_longopts = [])
     {
         $this->options = getopt($commande_longopts, $commande_shortopts);
 
-        foreach ($this->options as $this->first) {
-            break;
+        $this->key = array_keys($this->options);
+        $val = array_values($this->options);
+
+        if (isset($val[0])) {
+        $this->first  = $val[0];
+        }
+        if (isset($val[1])) {
+            $this->second = $val[1];
+        } else {
+            $this->second = null;
+        }
+        //$this->second = $val[1];
+        if (isset($val[2])) {
+            $this->third  = $val[2];
+        } elseif (isset($val[1])) {
+            $this->third  = $val[1];
+        } else {
+            $this->third  = null;
         }
 
-        $s = array_slice($this->options, 1, 1);
-        if (empty($s)) {
-            $this->second = 'apache_allow';
-        } else {
-            foreach ($s as $value) {
-                $this->second = $value;
-            }
-        }
-        $this->c = array_keys($this->options);
-        $this->v = array_values($this->options);
         return $this->options;
     }
     /**
@@ -165,14 +185,13 @@ class Application
      *
      * @param  string    $data The json data
      *
-     * @return body in json file
+     * @return all body in this day in json file
      */
     public function __query_date(string $data)
     {
         $fop = fopen($this->date, 'a+');
         fwrite($fop, "$data\n");
         fclose($fop);
-
     }
     /**
      * Save input to query.csv
@@ -180,57 +199,54 @@ class Application
      * @param  string    $k the command value
      * @param  string    $c The command key
      *
-     * @return input , date , command in csv file
+     * @return string    date , value , key in csv file
      */
     public function __query(string $k, string $c)
     {
         $fop = fopen($this->query, 'a+');
         fwrite($fop, date("Y-m-d H:i:s") . "," . $k . ",$c\n");
         fclose($fop);
-
     }
     /**
      * save to a given file
      *
-     * @param  string    $file file name
-     * @param  string    $data body
+     * @param  string|null    $file file name
+     * @param  string         $data body
      *
-     * @return file with data
+     * @return string         file with data
      */
-    public function __output(string $file, string $data)
+    public function __output(string $file = null, string $data)
     {
+
         if (isset($file)) {
-            $fop = fopen($file, 'a+');
+            $path = $this->ipfinderdata.'/'.$file;
+            $fop = fopen($path, 'a+');
             fwrite($fop, "$data\n");
             fclose($fop);
-        } else {
-            print 'give other file name';
+            print $this->colors['LIGHT_GREEN']."[!] ✓ File save in >>> \e[0;31;42m $path\e[0m\n";
         }
-
     }
+
     /**
-     * Out data to console
-     *
-     * @param  array    $data  data form call
-     *
-     * @return print data to console
+     *  Out data to console
+     * @param  array  $data data form call as array
+     * @param  string $json data form call as json
+     * @return string  print data to console
      */
-    public function __printData($data = [],$json)
+    public function __printData($data = [], string $json)
     {
         if ($this->output !== 'table') {
-           print $json."\n";
+            print "\e[0;37;41m$json \e[0m\n";
         } else {
-
             array_walk_recursive($data, function ($value, $key) {
                 (is_bool($value) ? $v = $value ? 'True' : 'False' : $v = $value);
                 (is_null($v) ? $t = 'null' : $t = $v);
-                print str_pad("{$this->color->red}| " . $key, 40) . "| {$this->color->white}{!} $t \n";
+                print str_pad("{$this->color->white}|" . $key, 40) . "| {$this->color->white}{!} \e[0;37;41m$t \e[0m \n";
             });
         }
 
 
         print "{$this->color->white}--------------------------------------------------------------------------------{$this->color->white}\n";
-
     }
     /**
      *
@@ -244,6 +260,7 @@ class Application
 {$this->color->white}[!]{$this->lang['web']}:: {$this->color->red}https://ipfinder.io
 {$this->color->white}[!]{$this->lang['php_version']}::{$this->color->red}[ " . phpversion() . " ]
 {$this->color->white}[!]{$this->lang['cli_version']}::{$this->color->red}[ " . $this->version . " ]
+{$this->color->white}[!]{$this->lang['config_file']}::{$this->color->red}[ " . $this->token . " ]
 {$this->color->white}[!]{$this->lang['config_file']}::{$this->color->red}[ " . $this->token . " ]
 {$this->color->white}[!]{$this->lang['uname']}::{$this->color->red}[ " . php_uname() . "]
 {$this->color->white}[!]{$this->lang['pwd']} ::{$this->color->red}[ " . getcwd() . "]
@@ -259,7 +276,7 @@ class Application
     public function Help(int $o)
     {
         if ($o == 1) {
-        print "
+            print "
 {$this->color->white}#### ########     ######## #### ##    ## ########  ######## ########     ##     ## ######## ##       ########
 {$this->color->green} ##  ##     ##    ##        ##  ###   ## ##     ## ##       ##     ##    ##     ## ##       ##       ##     ##
 {$this->color->white} ##  ##     ##    ##        ##  ####  ## ##     ## ##       ##     ##    ##     ## ##       ##       ##     ##
@@ -301,7 +318,20 @@ class Application
 \t[Example]:
 \t\t{$this->color->light_cyan} $ ipfinder -f AS1 --format juniper_junos {$this->color->light_cyan}
 \t\t{$this->color->light_cyan} $ ipfinder --firewall DZ -m web_config_allow {$this->color->light_cyan}
+{$this->color->end}-d ,--domain{$this->color->blue} {$this->lang['f_domain']}
+\t[Example]:
+\t\t{$this->color->light_cyan} $ ipfinder -d google.com {$this->color->light_cyan}
+\t\t{$this->color->light_cyan} $ ipfinder --domain google.com {$this->color->light_cyan}
+{$this->color->end}-dh ,--dhistory{$this->color->blue} {$this->lang['f_hdomain']}
+\t[Example]:
+\t\t{$this->color->light_cyan} $ ipfinder -dh google.com {$this->color->light_cyan}
+\t\t{$this->color->light_cyan} $ ipfinder --dhistory google.com {$this->color->light_cyan}
+{$this->color->end}-dl ,--dlist{$this->color->blue} {$this->lang['f_ldomain']}
+\t[Example]:
+\t\t{$this->color->light_cyan} $ ipfinder -dl AS1  {$this->color->light_cyan}
+\t\t{$this->color->light_cyan} $ ipfinder --dlist DZ  {$this->color->light_cyan}
 {$this->color->end}-s ,--status{$this->color->blue}   {$this->lang['f_information']}
+
 \t[Example]:
 \t\t{$this->color->light_cyan} $ ipfinder -s{$this->color->light_cyan}
 {$this->color->end}-g ,--config{$this->color->blue}  {$this->lang['token']}
@@ -309,9 +339,15 @@ class Application
 \t\t{$this->color->light_cyan} $ ipfinder --config{$this->color->light_cyan}
 {$this->color->end}-l ,--shell{$this->color->blue}  {$this->lang['shell']}
 \n";
-        }
-        else {
+        } else {
             print "
+ __  .______    _______  __  .__   __.  _______   _______ .______
+|  | |   _  \  |   ____||  | |  \ |  | |       \ |   ____||   _  \
+|  | |  |_)  | |  |__   |  | |   \|  | |  .--.  ||  |__   |  |_)  |
+|  | |   ___/  |   __|  |  | |  . `  | |  |  |  ||   __|  |      /
+|  | |  |      |  |     |  | |  |\   | |  '--'  ||  |____ |  |\  \----.
+|__| | _|      |__|     |__| |__| \__| |_______/ |_______|| _| `._____| {$this->color->red}version:{$this->version}{$this->color->red}{$this->color->white} official documentation https://ipfinder.io/docs{$this->color->white}
+
 {$this->color->red}[1,help,h]:: {$this->color->white}{$this->lang['help_app']}
 {$this->color->red}[2,auth,a]:: {$this->color->white}{$this->lang['l_ipaddress']}
 {$this->color->red}[3,status,s]:: {$this->color->white}{$this->lang['f_information']}
@@ -319,11 +355,13 @@ class Application
 {$this->color->red}[5,asn,n]:: {$this->color->white}{$this->lang['f_asnumber']}
 {$this->color->red}[6,ranges,r]:: {$this->color->white}{$this->lang['f_ranges']}
 {$this->color->red}[7,firewall,f]:: {$this->color->white}{$this->lang['f_firewall']}
-{$this->color->red}[8,exit,x]:: {$this->color->white}{$this->lang['exit']}
-{$this->color->red}[9,clear,c]:: {$this->color->white}{$this->lang['help_app']}
+{$this->color->red}[8,domain,d]:: {$this->color->white}{$this->lang['f_domain']}
+{$this->color->red}[9,dhistory,dh]:: {$this->color->white}{$this->lang['f_hdomain']}
+{$this->color->red}[10,dlist,dl]:: {$this->color->white}{$this->lang['f_ldomain']}
+{$this->color->red}[11,exit,x]:: {$this->color->white}{$this->lang['exit']}
+{$this->color->red}[12,clear,c]:: {$this->color->white}{$this->lang['help_app']}
             ";
         }
-
     }
     /**
      * read file
@@ -340,21 +378,20 @@ class Application
         foreach ($this->path as $key) {
             $this->ouuut[] = $key;
         }
-
     }
     /**
      * Get details for an Your IP address.
-     * @param  string    $file file name
+     * @param  string|null    $file file name
      *
      * @return Your IP address data.
      */
-    public function __getAuth(string $file)
+    public function __getAuth(string $file = null)
     {
 
         try {
             print $this->banner->rand;
             $details = $this->lib->Authentication();
-            print $this->__printData($details,$this->lib->raw_body);
+            print $this->__printData($details, $this->lib->raw_body);
             $this->__query_date($this->lib->raw_body);
             $this->json = $this->lib->raw_body;
             $this->__output($file, $this->json);
@@ -364,87 +401,81 @@ class Application
     }
     /**
      *  details for an IP address or more .
-     * @param  string    $p    IP address or file name exists.
-     * @param  string    $file file name
+     * @param  string         $p    IP address or file name exists.
+     * @param  string|null    $file file name
      *
      *
      * @return IP address data.
      * @throws IPfinderException
      */
-    public function __getIp(string $p, string $file)
+    public function __getIp(string $p, string $file = null)
     {
 
         try {
-
             print $this->banner->rand;
             if (!file_exists($p)) {
                 Ipvalidation::validate($p);
                 $details = $this->lib->getAddressInfo($p);
-                print $this->__printData($details,$this->lib->raw_body);
+                print $this->__printData($details, $this->lib->raw_body);
                 $this->__query_date($this->lib->raw_body);
                 $this->json = $this->lib->raw_body;
 
                 $this->__output($file, $this->json);
                 // echo json_encode($this->lib->raw_body,JSON_UNESCAPED_UNICODE);
             } else {
-
                 $d = $this->__getfile($p);
                 foreach ($this->ouuut as $key) {
                     Ipvalidation::validate($key);
                     $details = $this->lib->getAddressInfo($key);
                     // print_r($details);
-                    print $this->__printData($details,$this->lib->raw_body);
+                    print $this->__printData($details, $this->lib->raw_body);
                     $this->__query_date($this->lib->raw_body);
                     $this->json = $this->lib->raw_body;
 
                     $this->__output($file, $this->json);
                 }
-                print "{$this->color->red}[!] {$this->lang['to_ip']} =>  : {$this->count}{$this->color->red}\n";
+                print "[!] {$this->lang['to_ip']}     >>> \e[0;31;42m {$this->count}\e[0m\n";
             }
-
         } catch (IPfinderException $e) {
             print "{$this->color->red}{$this->lang['error']} {$this->color->red}" . $e->getMessage() . " $p \n";
         }
     }
     /**
      * Get details for an AS number or more ..
-     * @param  string     $p     AS number or file name exists.
-     * @param  string     $file  file name
+     * @param  string          $p     AS number or file name exists.
+     * @param  string|null     $file  file name
      *
      *
      * @return AS number data.
      * @throws IPfinderException
      */
-    public function __getAsn(string $p, string $file)
+    public function __getAsn(string $p, string $file = null)
     {
 
         try {
-
             print $this->banner->rand;
             if (!file_exists($p)) {
                 Asnvalidation::validate($p);
                 $details = $this->lib->getAsn($p);
-                print $this->__printData($details,$this->lib->raw_body);
+                print $this->__printData($details, $this->lib->raw_body);
                 $this->__query_date($this->lib->raw_body);
                 $this->json = $this->lib->raw_body;
 
                 $this->__output($file, $this->json);
             } else {
-
                 $d = $this->__getfile($p);
                 foreach ($this->ouuut as $key) {
                     Asnvalidation::validate($key);
                     $details = $this->lib->getAsn($key);
                     // print_r($details);
-                    print $this->__printData($details,$this->lib->raw_body);
+                    print $this->__printData($details, $this->lib->raw_body);
                     $this->__query_date($this->lib->raw_body);
                     $this->json = $this->lib->raw_body;
 
                     $this->__output($file, $this->json);
                 }
-                print "{$this->color->red}[!] {$this->lang['to_as']} =>  : {$this->count}{$this->color->red}\n";
+                print "[!] {$this->lang['to_as']}    >>> \e[0;31;42m {$this->count}\e[0m\n";
             }
-
         } catch (IPfinderException $e) {
             print "{$this->color->red}{$this->lang['error']} {$this->color->red}" . $e->getMessage() . "\n";
         }
@@ -452,14 +483,14 @@ class Application
     /**
      * Get details for an Firewall.
      *
-     * @param  string    $p    AS number, alpha-2 country only.
-     * @param  string    $f    list formats supported
-     * @param  string    $file file name
+     * @param  string         $p    AS number, alpha-2 country only.
+     * @param  string         $f    list formats supported
+     * @param  string|null    $file file name
      *
      * @return Firewall data
      * @throws IPfinderException
      */
-    public function __firewall(string $p, string $f, string $file = 'test')
+    public function __firewall(string $p, string $f, string $file = null)
     {
 
         try {
@@ -469,7 +500,6 @@ class Application
             $this->__query_date($this->lib->raw_body);
             $this->json = $this->lib->raw_body;
             $this->__output($file, $this->json);
-
         } catch (IPfinderException $e) {
             print "{$this->color->red}{$this->lang['error']} {$this->color->red}" . $e->getMessage() . "\n";
         }
@@ -477,43 +507,103 @@ class Application
     /**
      * Get details for an Organization name.
      *
-     * @param  string    $p     Organization name.
-     * @param  string    $file  file name
+     * @param  string         $p     Organization name.
+     * @param  string|null    $file  file name
      *
      * @return Organization name data.
      */
-    public function __getRanges(string $p, string $file)
+    public function __getRanges(string $p, string $file = null)
     {
 
         try {
             print $this->banner->rand;
             $details = $this->lib->getRanges($p);
-            print $this->__printData($details,$this->lib->raw_body);
+            print $this->__printData($details, $this->lib->raw_body);
             $this->__query_date($this->lib->raw_body);
             $this->json = $this->lib->raw_body;
             $this->__output($file, $this->json);
+        } catch (IPfinderException $e) {
+            print "{$this->color->red}{$this->lang['error']} {$this->color->red}" . $e->getMessage() . "\n";
+        }
+    }
 
+    /**
+     * Get domain ip information
+     * @param  string      $d    valid domain name
+     * @param  string|null $file file name
+     * @return domain ip data
+     * @throws IPfinderException
+     */
+    public function __getDomain(string $d, string $file = null)
+    {
+        try {
+            print $this->banner->rand;
+            $details = $this->lib->getDomain($d);
+            print $this->__printData($details, $this->lib->raw_body);
+            $this->__query_date($this->lib->raw_body);
+            $this->json = $this->lib->raw_body;
+            $this->__output($file, $this->json);
+        } catch (IPfinderException $e) {
+            print "{$this->color->red}{$this->lang['error']} {$this->color->red}" . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Get domain  IP history information
+     * @param  string      $d    valid domain name
+     * @param  string|null $file file name
+     * @return Domain History data
+     * @throws IPfinderException
+     */
+    public function __getDomainHistory(string $d, string $file = null)
+    {
+        try {
+            print $this->banner->rand;
+            $details = $this->lib->getDomainHistory($d);
+            print $this->__printData($details, $this->lib->raw_body);
+            $this->__query_date($this->lib->raw_body);
+            $this->json = $this->lib->raw_body;
+            $this->__output($file, $this->json);
         } catch (IPfinderException $e) {
             print "{$this->color->red}{$this->lang['error']} {$this->color->red}" . $e->getMessage() . "\n";
         }
     }
     /**
+     * Get List Domain
+     * @param  string      $by     passing  a  ASN,Country,Ranges
+     * @param  string|null $file $file file name
+     * @return List Domain By ASN, Country,Ranges
+     */
+    public function __getDomainBy(string $by, string $file = null)
+    {
+        try {
+            print $this->banner->rand;
+            $details = $this->lib->getDomainBy($by);
+            print $this->__printData($details, $this->lib->raw_body);
+            $this->__query_date($this->lib->raw_body);
+            $this->json = $this->lib->raw_body;
+            $this->__output($file, $this->json);
+        } catch (IPfinderException $e) {
+            print "{$this->color->red}{$this->lang['error']} {$this->color->red}" . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
      * Get details for an API Token .
-     * @param  string    $file  file name
+     * @param  string|null    $file  file name
      *
      * @return The Token data.
      */
-    public function __getStatus(string $file)
+    public function __getStatus(string $file = null)
     {
 
         try {
             print $this->banner->rand;
             $details = $this->lib->getStatus();
-            print $this->__printData($details,$this->lib->raw_body);
+            print $this->__printData($details, $this->lib->raw_body);
             $this->json = $this->lib->raw_body;
 
             $this->__output($file, $this->json);
-
         } catch (IPfinderException $e) {
             print "{$this->color->red}{$this->lang['error']} {$this->color->red}" . $e->getMessage() . "\n";
         }
@@ -521,8 +611,8 @@ class Application
     /**
      * Get API Token as input
      *
-     * @param  array    $conf token and lang 
-     * 
+     * @param  array    $conf token and lang
+     *
      *
      * @return save  $conf in $this->token
      */
@@ -530,7 +620,7 @@ class Application
     {
         try {
             $this->conf       = fopen($this->token, "w");
-            $json = json_encode($conf,JSON_PRETTY_PRINT); 
+            $json = json_encode($conf, JSON_PRETTY_PRINT);
           //  $trim = str_replace('\n', "", $json); // remove newlines from jsondata
 
             fwrite($this->conf, $json);
@@ -565,12 +655,10 @@ class Application
                 sleep(3);
                 system("mv ipfinder.phar /usr/bin/ipfinder |  ipfinder -h");
                 exit();
-
             } else {
                 echo "ABORTING!\n";
             }
         }
-
     }
     /**
      *
@@ -593,50 +681,40 @@ class Application
             "shell::",
             "update::",
             "output:",
-            "version::"), 'a::i:n:r:f:m:s::h::g::l::u::o:v::');
+            "domain:",
+            "dhistory:",
+            "dlist:",
+            "version::"), 'a::i:n:r:f:m:s::h::g::l::u::o:v::d:dh:dl:');
         if ($co == null) {
             $this->Menu();
             exit(1);
         } else {
-            //    $this->__query($this->first, $this->c[0]);
+            $this->__query($this->first, $this->key[0]);
         }
 
-// (isset($this->options['h']) || isset($this->options['help']) ? $this->Help() : null);
-
-// (isset($this->options['a']) || isset($this->options['auth']) ? $this->__getAuth($this->second) : null);
-
-// (isset($this->options['i']) || isset($this->options['ip']) ? $this->__getIp($this->first, $this->second) : null);
-
-// (isset($this->options['n']) || isset($this->options['asn']) ? $this->__getAsn($this->first,$this->second) : null);
-
-// (isset($this->options['r']) || isset($this->options['ranges']) ?  $this->__getRanges($this->first,$this->second) : null);
-
-// (isset($this->options['f']) || isset($this->options['firewall']) || isset($this->options['m']) || isset($this->options['format']) ? $this->__firewall($this->first, $this->second, $this->v[2]) : null);
-
-// (isset($this->options['s']) || isset($this->options['status']) ? $this->__getStatus($this->second) : null);
-
-// (isset($this->options['g']) || isset($this->options['config']) ? $this->__config($this->first) : null);
-
-// (isset($this->options['u']) || isset($this->options['update']) ? $this->__update() : null);
-
         foreach ($co as $key => $value) {
-
             if ($key == 'h' || $key == 'help') {
                 $this->Help(1);
-            } elseif ($key == 'a' || $key == 'auth' ) {
-                $this->__getAuth($this->second);
-            }  elseif ($key == 'v' || $key == 'version') {
-               print "IPFinder Command Line Interface ".$this->version." by ipfinder.io Teams \n\n";
-            } elseif ($key == 'i' || $key == 'ip' ) {
-                $this->__getIp($this->first, $this->second);
+            } elseif ($key == 'a' || $key == 'auth') {
+                $this->__getAuth($this->third);
+            } elseif ($key == 'v' || $key == 'version') {
+                print "IPFinder Command Line Interface ".$this->version." by ipfinder.io Teams \n\n";
+            } elseif ($key == 'i' || $key == 'ip') {
+                $this->__getIp($this->first, $this->third);
             } elseif ($key == 'n' || $key == 'asn') {
-                $this->__getAsn($this->first, $this->second);
-            } elseif ($key == 'r' || $key == 'ranges' ) {
-                $this->__getRanges($this->first, $this->second);
-            } elseif ($key == 'f' || $key == 'firewall' || $key == 'm' || $key == 'format' ) {
-                $this->__firewall($this->first, $this->second, $this->v[2]);
-            } elseif ($key == 's' || $key == 'status' ) {
-                $this->__getStatus($this->second);
+                $this->__getAsn($this->first, $this->third);
+            } elseif ($key == 'r' || $key == 'ranges') {
+                $this->__getRanges($this->first, $this->third);
+            } elseif ($key == 'f' || $key == 'firewall' || $key == 'm' || $key == 'format') {
+                $this->__firewall($this->first, $this->second, $this->third);
+            } elseif ($key == 'd' || $key == 'domain') {
+                $this->__getDomain($this->first, $this->third);
+            } elseif ($key == 'dh' || $key == 'dhistory') {
+                $this->__getDomainHistory($this->first, $this->third);
+            } elseif ($key == 'dl' || $key == 'dlist') {
+                $this->__getDomainBy($this->first, $this->third);
+            } elseif ($key == 's' || $key == 'status') {
+                $this->__getStatus($this->third);
             } elseif ($key == 'g' || $key == 'config') {
                 print $this->color->yellow.$this->lang['e_token'];
                 $token = Shell::run();
@@ -649,97 +727,126 @@ class Application
                 $this->__update();
             } elseif ($key == 'l' || $key == 'shell') {
                     $this->Help(2);
-                    start:print $this->color->white."\n$ ipfinder: ";
+                    start:print $this->color->white."\n$ ipfinder: >>> ";
 
                     $sh = trim(fgets(STDIN, 1024));
-                    switch ($sh) {
-                        case 'help':
-                        case 'h':
-                        case 1:
-                            $this->Help(2);
-                            goto start;
-                            break;
-                        case 'auth':
-                        case 'a':
-                        case 2:
-                            $this->__getAuth($this->second);
-                            goto start; 
-                            break;
-                        case 'status':
-                        case 's':
-                        case 3:
-                            $this->__getStatus($this->second);
-                            goto start; 
-                            break;
-                        case 'ip':
-                        case 'i':
-                        case 4: 
-                            print $this->color->yellow.$this->lang['e_ip'];
-                            $ip = Shell::run();
-                            print $this->color->yellow.$this->lang['e_output'];
-                            $out = Shell::run();
-                            $this->__getIp($ip, $out);
-                            goto start; 
-                            break;
-                        case 'asn':
-                        case 'n':
-                        case 5:     
-                            print $this->color->yellow.$this->lang['e_asn'];
-                            $asn = Shell::run();
-                            print $this->color->yellow.$this->lang['e_output'];
-                            $out = Shell::run();
-                            $this->__getAsn($asn, $out);
-                            goto start; 
-                            break;
-                        case 'ranges':
-                        case 'r': 
-                        case 6:   
-                            print $this->color->yellow.$this->lang['e_org'];
-                            $range = Shell::run();
-                            print $this->color->yellow.$this->lang['e_output'];
-                            $out = Shell::run();
-                            $this->__getRanges($range, $out);
-                            
-                            goto start; 
-                            break;
-                        case 'firewall':
-                        case 'f':
-                        case 7:    
-                            print $this->color->yellow.$this->lang['e_firewall'];
-                            $firewall = Shell::run();
-                            print $this->color->yellow.$this->lang['e_format'];
-                            $format = Shell::run();
-                            print $this->color->yellow.$this->lang['e_output'];
-                            $out = Shell::run();
-                            $this->__firewall($firewall, $format, $out);
-                            
-                            goto start; 
-                            break;
-                        case 'exit':
-                        case 'x':
-                        case 8:
-                            print $this->lang['exit']."\n";
-                            exit();
-                            break;
-                        case 'clear':
-                        case 'c':
-                        case 9:
-                            system('clear');
-                            $this->Help(2);
-                            goto start; 
-                            break;
-                        default:
-                            print $this->color->yellow.$this->lang['p_option'];
-                            goto start;
-                            break;
-                    }
+                switch ($sh) {
+                    case 'help':
+                    case 'h':
+                    case 1:
+                        $this->Help(2);
+                        goto start;
+                        break;
+                    case 'auth':
+                    case 'a':
+                    case 2:
+                        $this->__getAuth(null);
+                        goto start;
+                        break;
+                    case 'status':
+                    case 's':
+                    case 3:
+                        $this->__getStatus(null);
+                        goto start;
+                        break;
+                    case 'ip':
+                    case 'i':
+                    case 4:
+                        print $this->color->yellow.$this->lang['e_ip'];
+                        $ip = Shell::run();
+                        print $this->color->yellow.$this->lang['e_output'];
+                        $out = Shell::run();
+                        $this->__getIp($ip, $out);
+                        goto start;
+                        break;
+                    case 'asn':
+                    case 'n':
+                    case 5:
+                        print $this->color->yellow.$this->lang['e_asn'];
+                        $asn = Shell::run();
+                        print $this->color->yellow.$this->lang['e_output'];
+                        $out = Shell::run();
+                        $this->__getAsn($asn, $out);
+                        goto start;
+                        break;
+                    case 'ranges':
+                    case 'r':
+                    case 6:
+                        print $this->color->yellow.$this->lang['e_org'];
+                        $range = Shell::run();
+                        print $this->color->yellow.$this->lang['e_output'];
+                        $out = Shell::run();
+                        $this->__getRanges($range, $out);
+
+                        goto start;
+                        break;
+                    case 'firewall':
+                    case 'f':
+                    case 7:
+                        print $this->color->yellow.$this->lang['e_firewall'];
+                        $firewall = Shell::run();
+                        print $this->color->yellow.$this->lang['e_format'];
+                        $format = Shell::run();
+                        print $this->color->yellow.$this->lang['e_output'];
+                        $out = Shell::run();
+                        $this->__firewall($firewall, $format, $out);
+
+                        goto start;
+                        break;
+                    case 'domain':
+                    case 'd':
+                    case 8:
+                        print $this->color->yellow.$this->lang['e_domain'];
+                        $domain = Shell::run();
+                        print $this->color->yellow.$this->lang['e_output'];
+                        $out = Shell::run();
+                        $this->__getDomain($domain, $out);
+
+                        goto start;
+                        break;
+                    case 'dhistory':
+                    case 'dh':
+                    case 9:
+                        print $this->color->yellow.$this->lang['e_domain'];
+                        $domain = Shell::run();
+                        print $this->color->yellow.$this->lang['e_output'];
+                        $out = Shell::run();
+                        $this->__getDomainHistory($domain, $out);
+                        goto start;
+                        break;
+                    case 'dlist':
+                    case 'dl':
+                    case 10:
+                        print $this->color->yellow.$this->lang['e_ldomainn'];
+                        $by = Shell::run();
+                        print $this->color->yellow.$this->lang['e_output'];
+                        $out = Shell::run();
+                        $this->__getDomainBy($by, $out);
+                        goto start;
+                        break;
+                    case 'exit':
+                    case 'x':
+                    case 11:
+                        print $this->lang['exit']."\n";
+                        exit();
+                        break;
+                    case 'clear':
+                    case 'c':
+                    case 12:
+                        system('clear');
+                        $this->Help(2);
+                        goto start;
+                        break;
+                    default:
+                        print $this->color->yellow.$this->lang['p_option'];
+                        goto start;
+                        break;
+                }
             } else {
                 //
                 //
                 //
             }
         }
-
     }
-
 }

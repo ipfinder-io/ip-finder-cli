@@ -1,6 +1,6 @@
-name: ipfinder-cli 
-base: core18 
-version: '1.0.0' 
+name: ipfinder-cli
+base: core18
+version: '1.0.2'
 summary: The official command line client for IPFinder https://ipfinder.io/
 description: |
   PFinder CLI (Command Line Interface) https://ipfinder.io/
@@ -10,8 +10,8 @@ description: |
   Supports IPv4 and IPv6
   Supports ASN number , RANGES , Firewall.
 
-grade: devel 
-confinement: devmode 
+grade: devel
+confinement: devmode
 
 apps:
   ipfinder:
@@ -22,5 +22,5 @@ apps:
 parts:
   ipfinder:
     # See 'snapcraft plugins'
-    source: https://github.com/ipfinder-io/ip-finder-cli/archive/v1.0.0.tar.gz
+    source: https://github.com/ipfinder-io/ip-finder-cli/archive/v$SNAPCRAFT_PROJECT_VERSION.tar.gz
     plugin: nil
