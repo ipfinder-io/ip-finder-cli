@@ -1,4 +1,3 @@
-# <a href='https://ipfinder.io/'><img src='https://camo.githubusercontent.com/46886c3e689a0d4a3f6c0733d1cab5d9f9a3926d/68747470733a2f2f697066696e6465722e696f2f6173736574732f696d616765732f6c6f676f732f6c6f676f2e706e67' height='60' alt='IP Finder'></a>
 #  IPFinder CLI (Command Line Interface) https://ipfinder.io/
 -  Supports Single IP Address, asn, ranges, firewall as Input
 -  Supports Bulk
@@ -16,7 +15,7 @@ To enable all the data fields and additional request volumes see [https://ipfind
 
 Visit [IPFinder documentation](https://ipfinder.io/docs).
 
-## System Requirements  
+## System Requirements
 -  PHP >= 7.0
 -  JSON PHP Extension
 -  CURL PHP Extension
@@ -36,15 +35,15 @@ Make sure to place composer's system-wide vendor bin directory in your `$PATH` s
 download the IPfinder cli using from github using curl
 ```bash
 ## using curl
-$ curl -LO https://github.com/ipfinder-io/ip-finder-cli/releases/download/v1.0.0/ipfinder.phar
+$ curl -LO https://github.com/ipfinder-io/ip-finder-cli/releases/download/v1.0.2/ipfinder.phar
 ## using wget
-$ wget https://github.com/ipfinder-io/ip-finder-cli/releases/download/v1.0.0/ipfinder.phar 
+$ wget https://github.com/ipfinder-io/ip-finder-cli/releases/download/v1.0.2/ipfinder.phar
 $ chmod +x ipfinder.phar
 $ sudo mv ipfinder.phar /usr/bin/ipfinder
 $ ipfinder -h
 ```
 ## Windows
-1.  Download [IPFINDER PHAR](https://github.com/ipfinder-io/ip-finder-cli/releases/download/v1.0.0/ipfinder.phar) from github
+1.  Download [IPFINDER PHAR](https://github.com/ipfinder-io/ip-finder-cli/releases/download/v1.0.2/ipfinder.phar) from github
 2.  Create a directory for PHP binaries; e.g., `C:\bin`
 3.  Open a command line (e.g., press **Windows+R** » type `cmd` » ENTER)
 4.  Create a wrapping batch script (results in `C:\bin\ipfinder.cmd`):
@@ -57,9 +56,74 @@ C:\bin> exit
 ```bash
 C:\Users\username> ipfinder --help
 ````
+### Command
+
+| shortopts   | longopts     | Description
+| ----------- | -----------  |
+| `-h`      | `--help`    | This help text
+| `-o`      | `--output`  |  save to a given file
+| `-u`      | `--update`  | App Code update
+| `-a`      | `--auth`  |  lookup your IP address information.
+| `-m`      | `--format`  | fetching IP address information.
+| `-i`      | `--ip`  | firewall  supported format https://ipfinder.io/docs/?shell#firewall.
+| `-n`      | `--asn`  | fetching AS number information.
+| `-r`      | `--ranges`  | fetching IP Address Ranges information.
+| `-f`      | `--firewall`  | fetching firewall information
+| `-d`      | `--domain`  | Get information for Domain IP.
+| `-d`      | `--dhistory`  | Get information for Domain IP history.
+| `-dl`     | `--dlist`  | Get information for list Domain By ASN, Country,Ranges.
+| `-s`      | `--status`  |  Get information for your token.
+| `-c`      | `--config`  | Add your Token and labg
+| `-l`      | `--shell`  | Run interactively
 
 
 ## License
 Licensed under the [Apache-2.0](https://github.com/ipfinder-io/ip-finder-cli/blob/master/LICENSE).
 ## Support
 Contact Us With Additional Questions About Our API, if you would like more information about our API that isn’t available in our IP geolocation API developer documentation, simply [contact](https://ipfinder.io/contact) us at any time and we’ll be able to help you find what you need..
+
+-h ,--help  This help text
+-o ,--output  save to a given file
+-u ,--update  App Code update
+-a ,--auth   lookup your IP address information.
+-m ,--format   Enter format name (e.g. web_config_deny, cisco_acl, network_object):
+    [Example]:
+         $ ipfinder -a
+-i ,--ip  fetching IP address information.
+    [Example]:
+         $ ipfinder --ip 1.0.0.0
+         $ ipfinder -i 2c0f:fb50:4003::
+         $ ipfinder -i filename
+-n ,--asn   fetching AS number information.
+    [Example]:
+         $ ipfinder --ip 1.0.0.0
+         $ ipfinder -i 2c0f:fb50:4003::
+         $ ipfinder -i filename
+-r ,--ranges fetching IP Address Ranges information.
+    [Example]:
+         $ ipfinder --ranges 'Telecom Algeria'
+         $ ipfinder -r 'Telecom Algeria'
+-f ,--firewall fetching firewall information supported format https://ipfinder.io/docs/?shell#firewall.
+    [Example]:
+         $ ipfinder -f AS1 --format juniper_junos
+         $ ipfinder --firewall DZ -m web_config_allow
+-d ,--domain Get information for Domain IP.
+    [Example]:
+         $ ipfinder -d google.com
+         $ ipfinder --domain google.com
+-dh ,--dhistory Get information for Domain IP history.
+    [Example]:
+         $ ipfinder -dh google.com
+         $ ipfinder --dhistory google.com
+-dl ,--dlist Get information for list Domain By ASN, Country,Ranges.
+    [Example]:
+         $ ipfinder -dl AS1
+         $ ipfinder --dlist DZ
+-s ,--status   Get information for your token.
+
+    [Example]:
+         $ ipfinder -s
+-g ,--config  Add your Token.
+    [Example]:
+         $ ipfinder --config
+-l ,--shell  Run interactively
