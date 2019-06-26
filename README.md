@@ -34,7 +34,10 @@ Make sure to place composer's system-wide vendor bin directory in your `$PATH` s
 ### Linux Distributions / macOS
 download the IPfinder cli using from github using curl
 ```bash
+$ brew tap ipfinder-io/ip-finder-cli
+$ brew install ip-fidner-cli
 ## using curl
+
 $ curl -LO https://github.com/ipfinder-io/ip-finder-cli/releases/download/v1.0.2/ipfinder.phar
 ## using wget
 $ wget https://github.com/ipfinder-io/ip-finder-cli/releases/download/v1.0.2/ipfinder.phar
